@@ -56,15 +56,21 @@ public abstract class AbstractFileUpload extends UIComponentBase {
 
     @Attribute
     public abstract String getAcceptedTypes();
+            
+    @Attribute
+    public abstract String getMaxFilesQuantity();
 
     @Attribute(defaultValue = "false")
     public abstract boolean isDisabled();
 
     @Attribute(defaultValue = "false")
     public abstract boolean isNoDuplicate();
-
+    
     @Attribute(events = @EventName("filesubmit"))
     public abstract String getOnfilesubmit();
+    
+    @Attribute(events = @EventName("typerejected"))
+    public abstract String getOntyperejected();
 
     @Attribute(events = @EventName("uploadcomplete"))
     public abstract String getOnuploadcomplete();
