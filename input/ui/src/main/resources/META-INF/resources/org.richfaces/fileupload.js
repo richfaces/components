@@ -70,6 +70,9 @@
                 if (this.acceptedTypes) {
                     this.acceptedTypes = jQuery.trim(this.acceptedTypes).toUpperCase().split(/\s*,\s*/);
                 }
+                if(this.maxFilesQuantity) {
+                    this.maxFilesQuantity = parseInt(jQuery.trim(this.maxFilesQuantity));
+                }
                 this.element = jQuery(this.attachToDom());
                 this.form = this.element.parents("form:first");
                 var header = this.element.children(".rf-fu-hdr:first");
@@ -95,6 +98,9 @@
                 this.iframe.load(jQuery.proxy(this.__load, this));
                 if (this.onfilesubmit) {
                     richfaces.Event.bind(this.element, "onfilesubmit", new Function("event", this.onfilesubmit));
+                }
+                if (this.ontyperejected) {
+                    richfaces.Event.bind(this.element, "ontyperejected", new Function("event", this.ontyperejected));
                 }
                 if (this.onuploadcomplete) {
                     richfaces.Event.bind(this.element, "onuploadcomplete", new Function("event", this.onuploadcomplete));
@@ -132,7 +138,6 @@
             },
 
             __removeAllItems: function(item) {
-                this.inputContainer.children(":not(:visible)").remove();
                 this.list.empty();
                 this.items.splice(0);
                 this.submitedItems.splice(0);
@@ -150,6 +155,11 @@
                 } else {
                     this.uploadButton.hide();
                     this.clearButton.hide();
+                }
+                if(this.maxFilesQuantity && this.__getItemsSumByState(ITEM_STATE.NEW) + this.__getSubmitedItemsSumByState(ITEM_STATE.DONE) >= this.maxFilesQuantity) {
+                    this.addButton.hide();
+                } else {
+                    this.addButton.css("display", "inline-block");
                 }
             },
 
@@ -227,6 +237,9 @@
                     var extension = this.acceptedTypes[i];
                     result = fileName.indexOf(extension, fileName.length - extension.length) !== -1;
                 }
+                if(!result) {
+                    richfaces.Event.fire(this.element, "ontyperejected", fileName);
+                }
                 return result;
             },
 
@@ -240,7 +253,35 @@
                     result = this.submitedItems[i].model.name == fileName;
                 }
                 return result;
-            }
+            }, 
+
+            __getItemsSumByState: function () {
+			    var statuses = {}
+			    var s = 0;
+			    for (var i = 0; i < arguments.length; i++) {
+    				statuses[arguments[i]] = true;
+			    }
+			    for (var i = 0; i < this.items.length; i++) {
+    				if (statuses[this.items[i].model.state]) {
+					    s++;
+				    }
+			    }
+			    return s;
+		    },
+
+		    __getSubmitedItemsSumByState: function () {
+			    var statuses = {}
+			    var s = 0;
+			    for (var i = 0; i < arguments.length; i++) {
+    				statuses[arguments[i]] = true;
+			    }
+			    for (var i = 0; i < this.submitedItems.length; i++) {
+    				if (statuses[this.submitedItems[i].model.state]) {
+					    s++;
+				    }
+			    }
+			    return s;
+		    }         
         });
 
     var Item = function(fileUpload, fileName) {
