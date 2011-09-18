@@ -42,7 +42,6 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
-import javax.smartcardio.ATR;
 
 import org.ajax4jsf.javascript.JSObject;
 import org.richfaces.HeaderAlignment;
