@@ -42,8 +42,11 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.smartcardio.ATR;
 
 import org.ajax4jsf.javascript.JSObject;
+import org.richfaces.HeaderAlignment;
+import org.richfaces.HeaderPosition;
 import org.richfaces.cdk.annotations.JsfRenderer;
 import org.richfaces.component.AbstractTab;
 import org.richfaces.component.AbstractTabPanel;
@@ -99,9 +102,11 @@ public class TabPanelRenderer extends TogglePanelRenderer {
     @Override
     protected void doEncodeBegin(ResponseWriter w, FacesContext context, UIComponent component) throws IOException {
         super.doEncodeBegin(w, context, component);
-
-        writeTabsLine(w, context, component);
-        writeTabsLineSeparator(w, component);
+        AbstractTabPanel tabPanel = (AbstractTabPanel) component;
+        if ((null == tabPanel.getHeaderPosition()) || (tabPanel.getHeaderPosition().equals(HeaderPosition.top))) {
+            writeTabsLine(w, context, component);
+            writeTabsLineSeparator(w, component);
+        }
     }
 
     private void writeTabsLineSeparator(ResponseWriter writer, UIComponent component) throws IOException {
@@ -112,8 +117,12 @@ public class TabPanelRenderer extends TogglePanelRenderer {
 
     private void writeTabsLine(ResponseWriter w, FacesContext context, UIComponent comp) throws IOException {
         w.startElement(DIV, comp);
-        w.writeAttribute(CLASS, "rf-tab-hdr-tabline-vis", null);
-
+        AbstractTabPanel tabPanel = (AbstractTabPanel) comp;
+        if ((null == tabPanel.getHeaderPosition()) || tabPanel.getHeaderPosition().equals(HeaderPosition.top)) {
+            w.writeAttribute(CLASS, "rf-tab-hdr-tabline-top-vis", null);
+        } else {
+            w.writeAttribute(CLASS, "rf-tab-hdr-tabline-btm-vis", null);
+        }
         w.startElement("table", comp);
         w.writeAttribute(CLASS_ATTRIBUTE, "rf-tab-hdr-tabs", null);
         w.writeAttribute("cellspacing", "0", null);
@@ -154,10 +163,18 @@ public class TabPanelRenderer extends TogglePanelRenderer {
     private void writeTopTabHeader(FacesContext context, ResponseWriter writer, AbstractTab tab) throws IOException {
         boolean isActive = tab.isActive();
         boolean isDisabled = tab.isDisabled();
-
+        // TODO: Ilya, review. Much HTML because we always encoding all states. Need to optimize somehow.
         encodeTabHeader(context, tab, writer, inactive, !isActive && !isDisabled);
         encodeTabHeader(context, tab, writer, active, isActive && !isDisabled);
         encodeTabHeader(context, tab, writer, disabled, isDisabled);
+    }
+
+    private String positionAbbreviation(AbstractTab tab) {
+        if ((null != tab.getParentPanel().getHeaderPosition())
+            && (tab.getParentPanel().getHeaderPosition().equals(HeaderPosition.bottom))) {
+            return "btm";
+        } else
+            return "top";
     }
 
     private void encodeTabHeader(FacesContext context, AbstractTab tab, ResponseWriter writer,
@@ -168,8 +185,8 @@ public class TabPanelRenderer extends TogglePanelRenderer {
         renderPassThroughAttributes(context, tab, HEADER_ATTRIBUTES);
         writer.writeAttribute(
             CLASS_ATTRIBUTE,
-            concatClasses("rf-tab-hdr rf-tab-hdr-" + state.abbreviation(), attributeAsString(tab, "headerClass"),
-                attributeAsString(tab, state.headerClass())), null);
+            concatClasses("rf-tab-hdr " + " rf-tab-hdr-" + positionAbbreviation(tab) + '-' + state.abbreviation(),
+                attributeAsString(tab, "headerClass"), attributeAsString(tab, state.headerClass())), null);
         writer.writeAttribute(STYLE_ATTRIBUTE,
             concatStyles(isDisplay ? "" : "display : none", attributeAsString(tab, "headerStyle")), null);
 
@@ -199,7 +216,12 @@ public class TabPanelRenderer extends TogglePanelRenderer {
     }
 
     private void writeTopTabFirstSpacer(ResponseWriter w, UIComponent comp) throws IOException {
-        writeTopTabSpacer(w, comp, "padding-left: 5px;", "rf-tab-hdr-spcr");
+        AbstractTabPanel tabPanel = (AbstractTabPanel) comp;
+        if ((null != tabPanel.getHeaderAlignment()) && (tabPanel.getHeaderAlignment().equals(HeaderAlignment.right))) {
+            writeTopTabSpacer(w, comp, "padding-left: 5px; width:100%", "rf-tab-hdr-spcr");
+        } else {
+            writeTopTabSpacer(w, comp, "padding-left: 5px;", "rf-tab-hdr-spcr");
+        }
     }
 
     private void writeTopTabSpacer(ResponseWriter w, UIComponent comp) throws IOException {
@@ -207,7 +229,12 @@ public class TabPanelRenderer extends TogglePanelRenderer {
     }
 
     private void writeTopTabLastSpacer(ResponseWriter w, UIComponent comp) throws IOException {
-        writeTopTabSpacer(w, comp, "padding-right: 5px; width: 100%;", "rf-tab-hdr-spcr");
+        AbstractTabPanel tabPanel = (AbstractTabPanel) comp;
+        if ((tabPanel.getHeaderAlignment() != null)&&(tabPanel.getHeaderAlignment().equals(HeaderAlignment.right))) {
+            writeTopTabSpacer(w, comp, "padding-right: 5px;", "rf-tab-hdr-spcr");
+        } else {
+            writeTopTabSpacer(w, comp, "padding-right: 5px; width: 100%;", "rf-tab-hdr-spcr");
+        }
     }
 
     private void writeTopTabSpacer(ResponseWriter w, UIComponent comp, String style, String styleClass) throws IOException {
@@ -220,6 +247,18 @@ public class TabPanelRenderer extends TogglePanelRenderer {
 
     @Override
     protected void doEncodeEnd(ResponseWriter writer, FacesContext context, UIComponent component) throws IOException {
+        AbstractTabPanel tabPanel = (AbstractTabPanel) component;
+        if ((tabPanel.getHeaderPosition() != null) && (tabPanel.getHeaderPosition().equals(HeaderPosition.bottom))) {
+            writeTabsLineSeparator(writer, component);
+            writeTabsLine(writer, context, component);
+        }
+        if (tabPanel.getChildCount() > 0) {
+            for (UIComponent child : tabPanel.getChildren()) {
+                AbstractTab tab = (AbstractTab) child;
+                TabRenderer renderer = (TabRenderer) tab.getRenderer(context);
+                renderer.writeJavaScript(writer, context, tab);
+            }
+        }
         writer.endElement(HtmlConstants.DIV_ELEM);
     }
 
