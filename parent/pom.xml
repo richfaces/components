@@ -190,11 +190,27 @@
                                 <goals>
                                     <goal>generate</goal>
                                 </goals>
-                                <configuration>
-                                    <rebelXmlDirectory>src/main/resources</rebelXmlDirectory>
-                                </configuration>
                             </execution>
                         </executions>
+                        <configuration>
+                            <showGenerated>true</showGenerated>
+                            <!-- workaround for *.faces-config.xml loaded twice [1]:
+                                    - setup classDirectory to non-existing directory
+                                    - create new classpath element with exclusion of configuration files
+                                    [1] http://zeroturnaround.com/forum/topic.php?id=1879&replies=6#post-7865
+                             -->
+                            <classesDirectory>target/non-existing</classesDirectory>
+                            <classpath>
+                                <resources>
+                                    <resource>
+                                        <directory>target/classes</directory>
+                                        <excludes>
+                                            <exclude>META-INF/**</exclude>
+                                        </excludes>
+                                    </resource>
+                                </resources>
+                            </classpath>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
