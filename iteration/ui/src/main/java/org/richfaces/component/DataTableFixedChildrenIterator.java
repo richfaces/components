@@ -55,6 +55,7 @@ class DataTableFixedChildrenIterator extends AbstractIterator<UIComponent> {
             UIComponent child = dataTableChildren.next();
             if (child instanceof UIColumn || child instanceof AbstractColumn) {
                 columnFacets = child.getFacets().values().iterator();
+                return child;
             }
         }
 
