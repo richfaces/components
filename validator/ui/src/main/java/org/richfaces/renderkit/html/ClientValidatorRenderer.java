@@ -4,20 +4,7 @@ package org.richfaces.renderkit.html;
 // Imports
 //
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.faces.FacesException;
-import javax.faces.component.ActionSource;
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UIComponent;
-import javax.faces.component.behavior.ClientBehavior;
-import javax.faces.component.behavior.ClientBehaviorContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.render.ClientBehaviorRenderer;
-
+import com.google.common.collect.Lists;
 import org.ajax4jsf.javascript.JSReference;
 import org.ajax4jsf.javascript.ScriptUtils;
 import org.richfaces.application.ServiceTracker;
@@ -31,7 +18,18 @@ import org.richfaces.validator.ConverterDescriptor;
 import org.richfaces.validator.FacesObjectDescriptor;
 import org.richfaces.validator.ValidatorDescriptor;
 
-import com.google.common.collect.Lists;
+import javax.faces.FacesException;
+import javax.faces.component.ActionSource;
+import javax.faces.component.EditableValueHolder;
+import javax.faces.component.UIComponent;
+import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.behavior.ClientBehaviorContext;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.PhaseId;
+import javax.faces.render.ClientBehaviorRenderer;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Renderer for component class org.richfaces.renderkit.html.AjaxValidatorRenderer
@@ -183,9 +181,9 @@ public class ClientValidatorRenderer extends ClientBehaviorRenderer {
             return new AjaxOnlyScript(createAjaxScript(behaviorContext, behavior));
         } else if (validatorScripts.size() < validators.size()) {
             return new ClientAndAjaxScript(clientSideConverterScript, validatorScripts, createAjaxScript(behaviorContext,
-                behavior));
+                behavior), behavior.getOnvalid(), behavior.getOninvalid());
         } else {
-            return new ClientOnlyScript(clientSideConverterScript, validatorScripts);
+            return new ClientOnlyScript(clientSideConverterScript, validatorScripts, behavior.getOnvalid(), behavior.getOninvalid());
         }
     }
 

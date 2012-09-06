@@ -22,11 +22,30 @@
  */
 package org.richfaces.component.behavior;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+import org.ajax4jsf.component.behavior.AjaxBehavior;
+import org.ajax4jsf.javascript.ScriptUtils;
+import org.richfaces.application.ServiceTracker;
+import org.richfaces.cdk.annotations.Attribute;
+import org.richfaces.cdk.annotations.JsfBehavior;
+import org.richfaces.cdk.annotations.Tag;
+import org.richfaces.cdk.annotations.TagType;
+import org.richfaces.component.ClientSideMessage;
+import org.richfaces.javascript.JavaScriptService;
+import org.richfaces.javascript.Message;
+import org.richfaces.log.Logger;
+import org.richfaces.log.RichfacesLogger;
+import org.richfaces.renderkit.html.ClientValidatorRenderer;
+import org.richfaces.renderkit.html.FormClientValidatorRenderer;
+import org.richfaces.validator.BeanValidatorService;
+import org.richfaces.validator.ConverterDescriptor;
+import org.richfaces.validator.FacesBeanValidator;
+import org.richfaces.validator.FacesConverterService;
+import org.richfaces.validator.FacesValidatorService;
+import org.richfaces.validator.ValidatorDescriptor;
 
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
@@ -48,26 +67,11 @@ import javax.faces.render.ClientBehaviorRenderer;
 import javax.faces.render.RenderKit;
 import javax.faces.validator.BeanValidator;
 import javax.faces.validator.Validator;
-
-import org.ajax4jsf.component.behavior.AjaxBehavior;
-import org.richfaces.application.ServiceTracker;
-import org.richfaces.cdk.annotations.JsfBehavior;
-import org.richfaces.cdk.annotations.Tag;
-import org.richfaces.cdk.annotations.TagType;
-import org.richfaces.component.ClientSideMessage;
-import org.richfaces.javascript.JavaScriptService;
-import org.richfaces.log.Logger;
-import org.richfaces.log.RichfacesLogger;
-import org.richfaces.renderkit.html.ClientValidatorRenderer;
-import org.richfaces.renderkit.html.FormClientValidatorRenderer;
-import org.richfaces.validator.BeanValidatorService;
-import org.richfaces.validator.ConverterDescriptor;
-import org.richfaces.validator.FacesBeanValidator;
-import org.richfaces.validator.FacesConverterService;
-import org.richfaces.validator.FacesValidatorService;
-import org.richfaces.validator.ValidatorDescriptor;
-
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <p class="changed_added_4_0">
@@ -85,6 +89,17 @@ public class ClientValidatorImpl extends AjaxBehavior implements ClientValidator
     private static final String VALUE = "value";
     private static final Logger LOG = RichfacesLogger.COMPONENTS.getLogger();
     private Class<?>[] groups;
+
+    private static final Function<? super FacesMessage, Message> MESSAGES_TRANSFORMER = new Function<FacesMessage, Message>() {
+        public Message apply(FacesMessage msg) {
+            return new Message(msg);
+        }
+    };
+
+    protected enum Properties {
+        onvalid,
+        oninvalid
+    }
 
     @Override
     public String getScript(ClientBehaviorContext behaviorContext) {
@@ -113,12 +128,35 @@ public class ClientValidatorImpl extends AjaxBehavior implements ClientValidator
             UIComponent component = event.getComponent();
             if (component instanceof EditableValueHolder) {
                 String clientId = component.getClientId(facesContext);
-                Iterator<FacesMessage> messages = facesContext.getMessages(clientId);
+                final ImmutableList<Message> messages = ImmutableList.copyOf(Iterators.transform(facesContext.getMessages(clientId), MESSAGES_TRANSFORMER));
+
                 JavaScriptService javaScriptService = ServiceTracker.getService(JavaScriptService.class);
                 javaScriptService.addPageReadyScript(facesContext, new MessageUpdateScript(clientId, messages));
+
+                if (messages.isEmpty()) {
+                    final String onvalid = getOnvalid();
+                    if (onvalid != null && !"".equals(onvalid.trim())) {
+                        javaScriptService.addPageReadyScript(facesContext, new AnonymousFunctionCall().addToBody(onvalid));
+                    }
+                } else {
+                    final String oninvalid = getOninvalid();
+                    if (oninvalid != null && !"".equals(oninvalid.trim())) {
+                        javaScriptService.addPageReadyScript(facesContext, new AnonymousFunctionCall("messages").addParameterValue(ScriptUtils.toScript(messages)).addToBody(oninvalid));
+                    }
+                }
             }
         }
         super.broadcast(event);
+    }
+
+    @Override
+    public void setLiteralAttribute(String name, Object value) {
+        super.setLiteralAttribute(name, value);
+        if (compare(Properties.oninvalid, name)) {
+            setOninvalid((String) value);
+        } else if (compare(Properties.onvalid, name)) {
+            setOnvalid((String) value);
+        }
     }
 
     public Set<UIComponent> getMessages(FacesContext context, UIComponent component) {
@@ -394,5 +432,23 @@ public class ClientValidatorImpl extends AjaxBehavior implements ClientValidator
     @Override
     public Collection<String> getRender() {
         return NONE;
+    }
+
+    @Attribute
+    public String getOnvalid() {
+        return (String) getStateHelper().eval(Properties.onvalid);
+    }
+
+    public void setOnvalid(String value) {
+        getStateHelper().put(Properties.onvalid, value);
+    }
+
+    @Attribute
+    public String getOninvalid() {
+        return (String) getStateHelper().eval(Properties.oninvalid);
+    }
+
+    public void setOninvalid(String value) {
+        getStateHelper().put(Properties.oninvalid, value);
     }
 }

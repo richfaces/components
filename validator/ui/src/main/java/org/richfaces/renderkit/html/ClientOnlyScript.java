@@ -1,26 +1,28 @@
 package org.richfaces.renderkit.html;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
-import org.ajax4jsf.javascript.ScriptUtils;
-import org.richfaces.resource.ResourceKey;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
+import org.ajax4jsf.javascript.JSFunctionDefinition;
+import org.ajax4jsf.javascript.ScriptUtils;
+import org.richfaces.resource.ResourceKey;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 public class ClientOnlyScript extends ValidatorScriptBase {
     public static final ResourceKey CSV_RESOURCE = ResourceKey.create("csv.reslib", "org.richfaces");
     protected final LibraryScriptFunction converter;
     protected final ImmutableList<? extends LibraryScriptFunction> validators;
     private final ImmutableSet<ResourceKey> resources;
+    protected final String onvalid;
+    protected final String oninvalid;
 
     public ClientOnlyScript(LibraryScriptFunction clientSideConverterScript,
-        Collection<? extends LibraryScriptFunction> validatorScripts) {
+                            Collection<? extends LibraryScriptFunction> validatorScripts, String onvalid, String oninvalid) {
         super();
         this.converter = clientSideConverterScript;
         this.validators = ImmutableList.copyOf(validatorScripts);
@@ -33,6 +35,8 @@ public class ClientOnlyScript extends ValidatorScriptBase {
             Iterables.addAll(resources, scriptString.getResources());
         }
         this.resources = ImmutableSet.copyOf(resources);
+        this.onvalid = onvalid;
+        this.oninvalid = oninvalid;
     }
 
     public Iterable<ResourceKey> getResources() {
@@ -63,6 +67,16 @@ public class ClientOnlyScript extends ValidatorScriptBase {
         }
         target.append(RIGHT_SQUARE_BRACKET);
         appendAjaxParameter(target);
+        if (oninvalid != null && oninvalid.trim().length() > 0) {
+            target.append(COMMA);
+            target.append("oninvalid:");
+            target.append(new JSFunctionDefinition("messages").addToBody(oninvalid).toScript());
+        }
+        if (onvalid != null && onvalid.trim().length() > 0) {
+            target.append(COMMA);
+            target.append("onvalid:");
+            target.append(new JSFunctionDefinition().addToBody(onvalid).toScript());
+        }
     }
 
     protected void appendValidator(Appendable target, LibraryScriptFunction validatorScript) throws IOException {
