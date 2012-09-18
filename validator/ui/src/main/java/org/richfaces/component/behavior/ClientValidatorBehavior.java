@@ -1,13 +1,12 @@
 package org.richfaces.component.behavior;
 
-import java.util.Collection;
+import org.richfaces.validator.ConverterDescriptor;
+import org.richfaces.validator.ValidatorDescriptor;
 
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorContext;
 import javax.faces.convert.Converter;
-
-import org.richfaces.validator.ConverterDescriptor;
-import org.richfaces.validator.ValidatorDescriptor;
+import java.util.Collection;
 
 /**
  * <p class="changed_added_4_0">
@@ -62,4 +61,8 @@ public interface ClientValidatorBehavior extends ClientBehavior {
     boolean isImmediateSet();
 
     boolean isImmediate();
+
+    String getOninvalid();
+
+    String getOnvalid();
 }

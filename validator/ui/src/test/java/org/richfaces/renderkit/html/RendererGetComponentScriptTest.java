@@ -1,23 +1,6 @@
 package org.richfaces.renderkit.html;
 
-import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
-import static org.junit.matchers.JUnitMatchers.hasItem;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.NumberConverter;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
+import com.google.common.collect.Lists;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -33,7 +16,22 @@ import org.richfaces.validator.ConverterDescriptor;
 import org.richfaces.validator.FacesObjectDescriptor;
 import org.richfaces.validator.ValidatorDescriptor;
 
-import com.google.common.collect.Lists;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.NumberConverter;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
+import static org.easymock.EasyMock.expect;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 
 @RunWith(MockTestRunner.class)
 public class RendererGetComponentScriptTest extends RendererTestBase {
@@ -125,7 +123,7 @@ public class RendererGetComponentScriptTest extends RendererTestBase {
     @Test
     public void testCreateValidatorScriptPartialValidator() throws Exception {
         ClientValidatorRenderer renderer = createStubRenderer(createConverterFunction(), createValidatorFunction());
-        setupBehavior(NumberConverter.class, Min.class, Max.class);
+        setupBehavior("alert(1)", "alert(messages)", NumberConverter.class, Min.class, Max.class);
         exceptGetAjaxScript();
         ComponentValidatorScript validatorScript = callGetScript(renderer);
         String script = validatorScript.toScript();
@@ -133,6 +131,7 @@ public class RendererGetComponentScriptTest extends RendererTestBase {
         assertThat(script,
             allOf(containsString(JSF_AJAX_REQUEST), containsString(REGEX_VALIDATOR), containsString(NUMBER_CONVERTER)));
         assertThat(validatorScript.getResources(), hasItem(CORE_LIBRARY_MATCHER));
+        assertThat(script,allOf(containsString("alert(1)"),containsString("alert(messages)")));
     }
 
     /**
@@ -160,7 +159,7 @@ public class RendererGetComponentScriptTest extends RendererTestBase {
     @Test
     public void testCreateValidatorScriptNullConverter() throws Exception {
         ClientValidatorRenderer renderer = createStubRenderer(null, createValidatorFunction());
-        setupBehavior(null, Min.class);
+        setupBehavior("", "", null, Min.class);
         ComponentValidatorScript validatorScript = callGetScript(renderer);
         String script = validatorScript.toScript();
         // check what generated script contains ajax and client side scripts.
@@ -180,7 +179,7 @@ public class RendererGetComponentScriptTest extends RendererTestBase {
     @Test
     public void testCreateValidatorScriptClientOnly() throws Exception {
         ClientValidatorRenderer renderer = createStubRenderer(createConverterFunction(), createValidatorFunction());
-        setupBehavior(NumberConverter.class, Min.class);
+        setupBehavior("", "", NumberConverter.class, Min.class);
         ComponentValidatorScript validatorScript = callGetScript(renderer);
         String script = validatorScript.toScript();
         // check what generated script contains ajax and client side scripts.
@@ -246,6 +245,12 @@ public class RendererGetComponentScriptTest extends RendererTestBase {
         }
         expect(mockBehavior.getValidators(behaviorContext)).andReturn(validatorDescriptors);
         expect(input.getClientId(environment.getFacesContext())).andStubReturn("foo:bar");
+    }
+
+    private void setupBehavior(String onvalid, String oninvalid, Class<? extends Converter> converter, Class<?>... validators) throws Exception {
+        setupBehavior(converter, validators);
+        expect(mockBehavior.getOnvalid()).andReturn(onvalid);
+        expect(mockBehavior.getOninvalid()).andReturn(oninvalid);
     }
 
     private void setupDescription(Class<?> converter, FacesObjectDescriptor descriptor) {
