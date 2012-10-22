@@ -38,7 +38,7 @@ import org.richfaces.cdk.annotations.TagType;
  */
 @JsfComponent(tag = @Tag(type = TagType.Facelets, handler = "org.richfaces.view.facelets.html.TogglePanelTagHandler"),
         renderer = @JsfRenderer(type = "org.richfaces.AccordionRenderer"), attributes = {"events-mouse-props.xml", "i18n-props.xml", "core-props.xml"})
-public abstract class AbstractAccordion extends AbstractTogglePanel {
+public abstract class AbstractAccordion extends NamedTogglePanel {
     public static final String COMPONENT_TYPE = "org.richfaces.Accordion";
     public static final String COMPONENT_FAMILY = "org.richfaces.Accordion";
 
