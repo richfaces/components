@@ -42,42 +42,25 @@ public abstract class NamedTogglePanel extends AbstractTogglePanel {
     public String getActiveItem() {
         String activeItemName = super.getActiveItem();
 
-        if (activeItemName == null) {
+        if (activeItemName == null || getIndexByName(activeItemName) < 0) {
             return getFirstNonDisabledItemName();
         } else {
-            AbstractTogglePanelTitledItem item = (AbstractTogglePanelTitledItem) getItem(activeItemName);
-            if (item != null && item.isDisabled()) {
-                return getFirstNonDisabledItemName();
-            }
+            return activeItemName;
         }
-
-        return activeItemName;
     }
 
     /**
      * Returns name of first non-disabled item in the list of panel's items.
      */
     private String getFirstNonDisabledItemName() {
-        AbstractTogglePanelTitledItem firstNonDisabledItem = getFirstNonDisabledItem();
-        if (firstNonDisabledItem == null) {
-            return null;
-        }
-
-        return firstNonDisabledItem.getName();
-    }
-
-    /**
-     * Returns first non-disabled item in the list of panel's items.
-     */
-    public AbstractTogglePanelTitledItem getFirstNonDisabledItem() {
-        final AtomicReference<AbstractTogglePanelTitledItem> result = new AtomicReference<AbstractTogglePanelTitledItem>(null);
+        final AtomicReference<String> result = new AtomicReference<String>(null);
 
         visitTogglePanelItems(this, new TogglePanelVisitCallback() {
             @Override
             public VisitResult visit(FacesContext facesContext, TogglePanelVisitState visitState) {
                 AbstractTogglePanelTitledItem item = (AbstractTogglePanelTitledItem) visitState.getItem();
                 if (!item.isDisabled()) {
-                    result.set(item);
+                    result.set(item.getName());
                     return VisitResult.COMPLETE;
                 } else {
                     return VisitResult.ACCEPT;
