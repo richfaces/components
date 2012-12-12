@@ -1,7 +1,7 @@
-<span>
+<span id="wrapper">
     <span id="placeholderID">
         <script id="placeholderIDScript" type="text/javascript">
-            //<![CDATA[
+//<![CDATA[
 new RichFaces.ui.Placeholder("placeholderID", {"targetId":"input","text":"Placeholder Text"} );
 //]]>
         </script>

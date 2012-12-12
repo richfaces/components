@@ -22,7 +22,7 @@
 package org.richfaces.integration.utils;
 
 /**
- * Return attribute which String representation is :"@name='#{param.@value}' "
+ * Creates attribute which String representation is :"@name='#{param.@value}' "
  *
  * @author <a href="mailto:jstefek@redhat.com">Jiri Stefek</a>
  */

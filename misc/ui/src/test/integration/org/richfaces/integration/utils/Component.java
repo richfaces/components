@@ -1,24 +1,23 @@
 /**
- * JBoss, Home of Professional Open Source Copyright 2012, Red Hat, Inc. and
- * individual contributors by the
+ * JBoss, Home of Professional Open Source
+ * Copyright 2012, Red Hat, Inc. and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * @authors tag. See the copyright.txt in the distribution for a full listing of
- * individual contributors.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or (at your option)
- * any later version.
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * This software is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this software; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
- * site: http://www.fsf.org.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.richfaces.integration.utils;
 
@@ -75,6 +74,9 @@ public class Component {
         return result;
     }
 
+    /**
+     * Ignores all namespaces defined in XMLNS.ignored()
+     */
     public Set<XMLNS> getAllNamespaces() {
         Set<XMLNS> result = Sets.<XMLNS>newLinkedHashSet();
         if (namespace != null) {
@@ -83,8 +85,7 @@ public class Component {
         for (Component c : componentsInBody) {
             result.addAll(c.getAllNamespaces());
         }
-        result.remove(XMLNS.jsfCore());
-        result.remove(XMLNS.jsfHtml());
+        result.removeAll(XMLNS.ignored());
         return result;
     }
 
@@ -96,6 +97,14 @@ public class Component {
 
     public Component withAttribute(Attribute a) {
         Component component = new Component(this);
+        component.attributes.remove(a);
+        component.addAtribute(a);
+        return component;
+    }
+
+    public Component withAttribute(String name, String value) {
+        Component component = new Component(this);
+        Attribute a = new Attribute(name, value);
         component.attributes.remove(a);
         component.addAtribute(a);
         return component;
@@ -154,5 +163,68 @@ public class Component {
                 && Objects.equal(this.componentsInBody, other.componentsInBody)
                 && Objects.equal(this.name, other.name)
                 && Objects.equal(this.namespace, other.namespace);
+    }
+
+    public static Component br() {
+        return new Component("br");
+    }
+
+    public static Component fConvertDateTime() {
+        return new Component("convertDateTime", XMLNS.jsfCore());
+    }
+    public static Component fSelectItems() {
+        return new Component("selectItems", XMLNS.jsfCore());
+    }
+
+    public static Component hInputText() {
+        return new Component("inputText", XMLNS.jsfHtml());
+    }
+
+    public static Component hInputTextarea() {
+        return new Component("inputTextarea", XMLNS.jsfHtml());
+    }
+
+    public static Component hOutputText() {
+        return new Component("outputText", XMLNS.jsfHtml());
+    }
+
+    public static Component hCommandButton() {
+        return new Component("commandButton", XMLNS.jsfHtml());
+    }
+
+    public static Component a4jCommandButton() {
+        return new Component("commandButton", XMLNS.a4j());
+    }
+
+    public static Component a4jOutputPanel() {
+        return new Component("outputPanel", XMLNS.a4j());
+    }
+
+    public static Component richAutocomplete() {
+        return new Component("autocomplete", XMLNS.richInput());
+    }
+
+    public static Component richCalendar() {
+        return new Component("calendar", XMLNS.richInput());
+    }
+
+    public static Component richInplaceInput() {
+        return new Component("inplaceInput", XMLNS.richInput());
+    }
+
+    public static Component richInplaceSelect() {
+        return new Component("inplaceSelect", XMLNS.richInput());
+    }
+
+    public static Component richPlaceholder() {
+        return new Component("placeholder", XMLNS.richMisc());
+    }
+
+    public static Component richSelect() {
+        return new Component("select", XMLNS.richInput());
+    }
+
+    public static Component uiDebug() {
+        return new Component("debug", XMLNS.jsfFacelets());
     }
 }

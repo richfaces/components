@@ -1,4 +1,4 @@
-<span>
+<span id="wrapper">
     <input id="input" type="text" name="input" class="rf-plhdr" value="Placeholder Text"/>
     <span id="placeholderID">
         <script id="placeholderIDScript" type="text/javascript">
