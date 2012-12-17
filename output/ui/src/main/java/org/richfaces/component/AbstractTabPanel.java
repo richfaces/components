@@ -38,7 +38,7 @@ import org.richfaces.cdk.annotations.TagType;
  */
 @JsfComponent(tag = @Tag(type = TagType.Facelets, handler = "org.richfaces.view.facelets.html.TogglePanelTagHandler"), renderer = @JsfRenderer(type = "org.richfaces.TabPanelRenderer"), attributes = {
         "core-props.xml", "events-mouse-props.xml", "i18n-props.xml" })
-public abstract class AbstractTabPanel extends AbstractTogglePanel {
+public abstract class AbstractTabPanel extends NamedTogglePanel {
     public static final String COMPONENT_TYPE = "org.richfaces.TabPanel";
     public static final String COMPONENT_FAMILY = "org.richfaces.TabPanel";
 
