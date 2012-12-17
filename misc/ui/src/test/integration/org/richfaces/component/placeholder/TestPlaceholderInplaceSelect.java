@@ -37,8 +37,13 @@ public class TestPlaceholderInplaceSelect extends AbstractPlaceholderTest {
     private InplaceSelectInput secondInplaceInput;
 
     @Override
-    String testedComponent() {
-        return "inplaceSelect";
+    Input getFirstInput() {
+        return firstInplaceInput;
+    }
+
+    @Override
+    Input getSecondInput() {
+        return secondInplaceInput;
     }
 
     @Override
@@ -51,19 +56,17 @@ public class TestPlaceholderInplaceSelect extends AbstractPlaceholderTest {
         return "item1";
     }
 
-    @Override
-    Input getFirstInput() {
-        return firstInplaceInput;
-    }
-
-    @Override
-    Input getSecondInput() {
-        return secondInplaceInput;
-    }
-
     @Test
-    public void testConverter() {
-        super.testConverter();
+    @Override
+    public void testAjaxSendsEmptyValue() {
+        // given
+        browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
+
+        //when
+        Graphene.guardXhr(a4jSubmitBtn).click();
+
+        // then
+        Graphene.waitAjax().until(Graphene.element(output).not().isVisible());
     }
 
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
@@ -72,9 +75,10 @@ public class TestPlaceholderInplaceSelect extends AbstractPlaceholderTest {
         super.testDefaultAttributes();
     }
 
+    @Ignore("https://issues.jboss.org/browse/RF-12623")
     @Test
-    public void testRendered() {
-        super.testRendered();
+    public void testSelector() {
+        super.testSelector();
     }
 
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
@@ -83,9 +87,9 @@ public class TestPlaceholderInplaceSelect extends AbstractPlaceholderTest {
         super.testStyleClass();
     }
 
-    @Test
-    public void when_input_with_placeholder_gains_focus_then_placeholder_is_removed() {
-        super.when_input_with_placeholder_gains_focus_then_placeholder_is_removed();
+    @Override
+    String testedComponent() {
+        return "inplaceSelect";
     }
 
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
@@ -98,38 +102,5 @@ public class TestPlaceholderInplaceSelect extends AbstractPlaceholderTest {
     @Test
     public void when_text_is_cleared_then_input_gets_placeholder_text_and_style_again() {
         super.when_text_is_cleared_then_input_gets_placeholder_text_and_style_again();
-    }
-
-    @Test
-    public void when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved() {
-        super.when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved();
-    }
-
-    @Test
-    @Override
-    public void testAjaxSendsEmptyValue() {
-        // given
-        browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
-        
-        //when
-        Graphene.guardXhr(a4jSubmitBtn).click();
-
-        // then
-        Graphene.waitAjax().until(Graphene.element(output).not().isVisible());
-    }
-
-    @Test
-    public void testAjaxSendsTextValue() {
-        super.testAjaxSendsTextValue();
-    }
-
-    @Test
-    public void testSubmitEmptyValue() {
-        super.testSubmitEmptyValue();
-    }
-
-    @Test
-    public void testSubmitTextValue() {
-        super.testSubmitTextValue();
     }
 }

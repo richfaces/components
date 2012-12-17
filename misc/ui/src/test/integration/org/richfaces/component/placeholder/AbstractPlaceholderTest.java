@@ -37,10 +37,9 @@ import org.jboss.arquillian.graphene.Graphene;
 import org.jboss.arquillian.graphene.spi.annotations.Root;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.arquillian.warp.impl.utils.URLUtils;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -70,26 +69,24 @@ public abstract class AbstractPlaceholderTest {
     protected static final String SECOND_INPUT_SELECTOR = "[id=second-input]";
     protected static final String EMPTY_STRING = "";
     protected static final String TESTED_VALUE = "some value";
-    //
+
     @Drone
     WebDriver browser;
-    //
+
     @ArquillianResource
     URL contextPath;
-    //
     @ArquillianResource
     SourceChecker sourceChecker;
-    //
+
     @FindBy(css = "[id$=ajaxSubmit]")
     WebElement a4jSubmitBtn;
     @FindBy(css = "[id$=httpSubmit]")
     WebElement httpSubmitBtn;
     @FindBy(css = "[id$=output]")
     WebElement output;
-    //
     @FindBy(id = PLACEHOLDER_ID)
     WebElement placeholderElement;
-    //
+
     private static final List<Component> TESTED_INPUT_COMPONENTS = new ArrayList<Component>();
 
     static {
@@ -142,22 +139,7 @@ public abstract class AbstractPlaceholderTest {
         return TESTED_VALUE;
     }
 
-    /**
-     * Tested in TestPlaceholderInputText
-     */
-    public void testComponentSourceWithSelector() throws Exception {
-        URL selectorUrl = URLUtils.buildUrl(contextPath, "selector-" + testedComponent() + ".jsf?selector=input");
-        sourceChecker.checkComponentSource(selectorUrl, "placeholder-with-selector.xmlunit.xml", By.id("wrapper"));
-    }
-
-    /**
-     * Tested in TestPlaceholderInputText
-     */
-    public void testComponentSourceWithoutSelector() throws Exception {
-        URL urL = new URL(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
-        sourceChecker.checkComponentSource(urL, "placeholder-without-selector.xmlunit.xml", By.id("wrapper"));
-    }
-
+    @Test
     public void testConverter() {
         // having
         browser.get(contextPath.toExternalForm() + "converter-" + testedComponent() + ".jsf");
@@ -166,6 +148,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals(PlaceHolderValue.DEFAULT_VALUE, getFirstInput().getDefaultText());
     }
 
+    @Test
     public void testDefaultAttributes() {
         // having
         browser.get(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
@@ -177,6 +160,7 @@ public abstract class AbstractPlaceholderTest {
                 getFirstInput().getStyleClass().contains(PLACEHOLDER_CLASS));
     }
 
+    @Test
     public void testRendered() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "rendered-" + testedComponent() + ".jsf");
@@ -184,9 +168,7 @@ public abstract class AbstractPlaceholderTest {
         assertFalse("Placeholder should not be present.", Graphene.element(placeholderElement).isPresent().apply(browser));
     }
 
-    /**
-     * For inputText and textarea
-     */
+    @Test
     public void testSelector() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "selector-" + testedComponent() + ".jsf?selector=[id=input]");
@@ -194,6 +176,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals(PLACEHOLDER_TEXT, getFirstInput().getDefaultText());
     }
 
+    @Test
     public void testSelectorEmpty() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "emptySelector-" + testedComponent() + ".jsf");
@@ -202,6 +185,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals(PLACEHOLDER_TEXT, getFirstInput().getDefaultText());
     }
 
+    @Test
     public void testStyleClass() {
         // having
         String className = "some-class";
@@ -212,6 +196,7 @@ public abstract class AbstractPlaceholderTest {
         assertTrue("input should contain specified class", getFirstInput().getStyleClass().contains(className));
     }
 
+    @Test
     public void when_input_with_placeholder_gains_focus_then_placeholder_is_removed() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
@@ -222,6 +207,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals("", getFirstInput().getEditedText());
     }
 
+    @Test
     public void when_text_is_changed_then_text_changes_color_to_default_and_removes_placeholder_style_classes() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
@@ -234,6 +220,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals(getTestedValue(), getFirstInput().getEditedText());
     }
 
+    @Test
     public void when_text_is_cleared_then_input_gets_placeholder_text_and_style_again() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
@@ -249,6 +236,7 @@ public abstract class AbstractPlaceholderTest {
         assertTrue("input should contain placeholder's default class", getFirstInput().getStyleClass().contains(PLACEHOLDER_CLASS));
     }
 
+    @Test
     public void when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved() {
         // having
         browser.navigate().to(contextPath.toExternalForm() + "index-" + testedComponent() + ".jsf");
@@ -262,6 +250,7 @@ public abstract class AbstractPlaceholderTest {
         assertEquals(getDefaultInputColor(), getFirstInput().getTextColor());
     }
 
+    @Test
     public void testAjaxSendsEmptyValue() {
         // given
         browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
@@ -281,6 +270,7 @@ public abstract class AbstractPlaceholderTest {
         Graphene.waitAjax().until(Graphene.element(output).not().isVisible());
     }
 
+    @Test
     public void testAjaxSendsTextValue() {
         // given
         browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
@@ -294,6 +284,7 @@ public abstract class AbstractPlaceholderTest {
         Graphene.waitAjax().until().element(output).text().equalTo(getTestedValueResponse());
     }
 
+    @Test
     public void testSubmitEmptyValue() {
         // given
         browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
@@ -305,6 +296,7 @@ public abstract class AbstractPlaceholderTest {
         Graphene.waitModel().until(Graphene.element(output).not().isVisible());
     }
 
+    @Test
     public void testSubmitTextValue() {
         // given
         browser.get(contextPath.toExternalForm() + "submit-" + testedComponent() + ".jsf");
@@ -384,6 +376,7 @@ public abstract class AbstractPlaceholderTest {
 
         for (Component c : TESTED_INPUT_COMPONENTS) {
             Component inputWithPlaceholder = c.withId(INPUT_ID).addToBody(placeholder);
+
             deployment.archive().addAsWebResource(new AssetBuilder()
                     .addComponents(inputWithPlaceholder)
                     .build(),
@@ -399,7 +392,9 @@ public abstract class AbstractPlaceholderTest {
                     .withId(PLACEHOLDER_ID)
                     .withValue("#{placeHolderValue}")
                     .withAttribute("converter", "placeHolderValueConverter"));
+
             Component secondInput = c.withId(SECOND_INPUT_ID);
+
             deployment.archive().addAsWebResource(new AssetBuilder()
                     .addComponents(
                     inputWithPlaceholder,
@@ -444,7 +439,7 @@ public abstract class AbstractPlaceholderTest {
         }
     }
 
-    static class Input {
+    public static class Input {
 
         @Root
         protected WebElement input;
@@ -478,7 +473,7 @@ public abstract class AbstractPlaceholderTest {
         }
     }
 
-    static class InplaceInput extends Input {
+    public static class InplaceInput extends Input {
 
         @FindBy(css = "input[id$=Input]")
         WebElement inplaceInput;
@@ -523,7 +518,7 @@ public abstract class AbstractPlaceholderTest {
         }
     }
 
-    static class InplaceSelectInput extends InplaceInput {
+    public static class InplaceSelectInput extends InplaceInput {
 
         @Override
         public void setTestedValue(String value) {
@@ -532,7 +527,7 @@ public abstract class AbstractPlaceholderTest {
         }
     }
 
-    static class SelectInput extends Input {
+    public static class SelectInput extends Input {
 
         @Override
         public void setTestedValue(String value) {

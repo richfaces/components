@@ -36,11 +36,6 @@ public class TestPlaceholderInplaceInput extends AbstractPlaceholderTest {
     private InplaceInput secondInplaceInput;
 
     @Override
-    String testedComponent() {
-        return "inplaceInput";
-    }
-
-    @Override
     Input getFirstInput() {
         return firstInplaceInput;
     }
@@ -50,20 +45,16 @@ public class TestPlaceholderInplaceInput extends AbstractPlaceholderTest {
         return secondInplaceInput;
     }
 
-    @Test
-    public void testConverter() {
-        super.testConverter();
-    }
-
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
     @Test
     public void testDefaultAttributes() {
         super.testDefaultAttributes();
     }
 
+    @Ignore("https://issues.jboss.org/browse/RF-12623")
     @Test
-    public void testRendered() {
-        super.testRendered();
+    public void testSelector() {
+        super.testSelector();
     }
 
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
@@ -72,9 +63,9 @@ public class TestPlaceholderInplaceInput extends AbstractPlaceholderTest {
         super.testStyleClass();
     }
 
-    @Test
-    public void when_input_with_placeholder_gains_focus_then_placeholder_is_removed() {
-        super.when_input_with_placeholder_gains_focus_then_placeholder_is_removed();
+    @Override
+    String testedComponent() {
+        return "inplaceInput";
     }
 
     @Ignore(value = "https://issues.jboss.org/browse/RF-12651")
@@ -87,30 +78,5 @@ public class TestPlaceholderInplaceInput extends AbstractPlaceholderTest {
     @Test
     public void when_text_is_cleared_then_input_gets_placeholder_text_and_style_again() {
         super.when_text_is_cleared_then_input_gets_placeholder_text_and_style_again();
-    }
-
-    @Test
-    public void when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved() {
-        super.when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved();
-    }
-
-    @Test
-    public void testAjaxSendsEmptyValue() {
-        super.testAjaxSendsEmptyValue();
-    }
-
-    @Test
-    public void testAjaxSendsTextValue() {
-        super.testAjaxSendsTextValue();
-    }
-
-    @Test
-    public void testSubmitEmptyValue() {
-        super.testSubmitEmptyValue();
-    }
-
-    @Test
-    public void testSubmitTextValue() {
-        super.testSubmitTextValue();
     }
 }

@@ -22,7 +22,7 @@
 package org.richfaces.component.placeholder;
 
 import java.awt.Color;
-import org.junit.Test;
+
 import org.openqa.selenium.support.FindBy;
 
 /**
@@ -36,8 +36,8 @@ public class TestPlaceholderTextarea extends AbstractPlaceholderTest {
     private Input secondInput;
 
     @Override
-    String testedComponent() {
-        return "inputTextarea";
+    protected Color getDefaultInputColor() {
+        return new Color(26, 26, 26);
     }
 
     @Override
@@ -46,81 +46,12 @@ public class TestPlaceholderTextarea extends AbstractPlaceholderTest {
     }
 
     @Override
-    protected Color getDefaultInputColor() {
-        return new Color(26, 26, 26);
-    }
-
     public Input getSecondInput() {
         return secondInput;
     }
 
-    @Test
-    public void testConverter() {
-        super.testConverter();
-    }
-
-    @Test
-    public void testDefaultAttributes() {
-        super.testDefaultAttributes();
-    }
-
-    @Test
-    public void testRendered() {
-        super.testRendered();
-    }
-
-    @Test
-    public void testSelector() {
-        super.testSelector();
-    }
-
-    @Test
-    public void testSelectorEmpty() {
-        super.testSelectorEmpty();
-    }
-
-    @Test
-    public void testStyleClass() {
-        super.testStyleClass();
-    }
-
-    @Test
-    public void when_input_with_placeholder_gains_focus_then_placeholder_is_removed() {
-        super.when_input_with_placeholder_gains_focus_then_placeholder_is_removed();
-    }
-
-    @Test
-    public void when_text_is_changed_then_text_changes_color_to_default_and_removes_placeholder_style_classes() {
-        super.when_text_is_changed_then_text_changes_color_to_default_and_removes_placeholder_style_classes();
-    }
-
-    @Test
-    public void when_text_is_cleared_then_input_gets_placeholder_text_and_style_again() {
-        super.when_text_is_cleared_then_input_gets_placeholder_text_and_style_again();
-    }
-
-    @Test
-    public void when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved() {
-        super.when_text_is_changed_and_input_is_blurred_then_typed_text_is_preserved();
-    }
-
-    @Test
-    public void testAjaxSendsEmptyValue() {
-        super.testAjaxSendsEmptyValue();
-    }
-
-    @Test
-    public void testAjaxSendsTextValue() {
-        super.testAjaxSendsTextValue();
-    }
-
-    @Test
-    public void testSubmitEmptyValue() {
-        super.testSubmitEmptyValue();
-    }
-
-    @Test
-    public void testSubmitTextValue() {
-        super.testSubmitTextValue();
+    @Override
+    String testedComponent() {
+        return "inputTextarea";
     }
 }
