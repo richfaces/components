@@ -134,7 +134,7 @@ public class TooltipRenderer extends DivPanelRenderer implements MetaComponentRe
         writer.startElement(getMarkupElement(tooltip), tooltip);
         writer.writeAttribute(ID_ATTRIBUTE, tooltip.getClientId(context) + ":loading", null);
         writer.writeAttribute(CLASS_ATTRIBUTE, "rf-tt-loading", null);
-        UIComponent loading = tooltip.getFacet("loading");
+        UIComponent loading = tooltip.getFacet("defaultContent");
         if (loading != null && loading.isRendered()) {
             loading.encodeAll(context);
         } else {
