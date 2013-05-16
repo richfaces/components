@@ -64,20 +64,15 @@
             },
 
             showPopup: function() {
-                this.isSaved = false;
-                this.element.addClass(this.editCss);
-                this.editContainer.removeClass(this.noneCss);
-
-                this.editState = true;
-                this.scrollElements = rf.Event.bindScrollEventHandlers(this.id, this.__scrollHandler, this);
-                this.__setInputFocus();
-                this.onfocus();
                 this.__showPopup();
 
             },
             __showPopup: function() {
                 this.popupList.show();
                 this.__hideLabel();
+            },
+            hidePopup: function() {
+                this.__hidePopup();
             },
             __hidePopup: function() {
                 this.popupList.hide();
@@ -213,7 +208,7 @@
                 return this.selValueInput.val();
             },
             setValue: function(value) {
-                var item = this.list.__selectItemByValue();
+                var item = this.list.__selectItemByValue(value);
                 var clientSelectItem = item.data('clientSelectItem');
                 this.__setValue(clientSelectItem.label);
                 this.save();
