@@ -64,7 +64,7 @@
             },
 
             showPopup: function() {
-                this.__showPopup();
+                $super.__show.call(this);
 
             },
             __showPopup: function() {
@@ -72,7 +72,7 @@
                 this.__hideLabel();
             },
             hidePopup: function() {
-                this.__hidePopup();
+            	$super.__hide.call(this);
             },
             __hidePopup: function() {
                 this.popupList.hide();
