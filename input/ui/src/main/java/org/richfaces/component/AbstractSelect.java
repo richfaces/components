@@ -97,6 +97,17 @@ public abstract class AbstractSelect extends AbstractSelectComponent {
     @Attribute(hidden = true)
     public abstract String getDisabledClass();
 
+    /**
+     * <p>
+     * If "true" the items of the list will get title attributes.
+     * </p>
+     * <p>
+     * Default is "false"
+     * </p>
+     */
+    @Attribute(defaultValue = "false")
+    public abstract boolean isEnableItemTitles();
+
     // --------- core-props.xml
 
     @Attribute

@@ -34,6 +34,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.model.SelectItem;
 
 import org.richfaces.component.AbstractSelectComponent;
+import org.richfaces.component.AbstractSelect;
 import org.richfaces.component.util.HtmlUtil;
 import org.richfaces.component.util.InputUtils;
 import org.richfaces.component.util.SelectUtils;
@@ -49,6 +50,7 @@ public final class SelectHelper {
     public static final String OPTIONS_ENABLE_MANUAL_INPUT = "enableManualInput";
     public static final String OPTIONS_LIST_SELECT_FIRST = "selectFirst";
     public static final String OPTIONS_INPUT_DEFAULT_LABEL = "defaultLabel";
+    public static final String OPTIONS_ENABLE_ITEM_TITLES = "enableItemTitles";
     public static final Map<String, ComponentAttribute> SELECT_LIST_HANDLER_ATTRIBUTES =
             Collections.unmodifiableMap(ComponentAttribute.createMap(
             new ComponentAttribute(HtmlConstants.ONCLICK_ATTRIBUTE).setEventNames("listclick").setComponentAttributeName("onlistclick"),
@@ -86,6 +88,7 @@ public final class SelectHelper {
     public static void encodeItems(FacesContext facesContext, UIComponent component, List<ClientSelectItem> clientSelectItems,
         String itemHtmlElement, String defaultItemCss) throws IOException {
         AbstractSelectComponent select = (AbstractSelectComponent) component;
+        AbstractSelect sel = (AbstractSelect) component;
         if (clientSelectItems != null && !clientSelectItems.isEmpty()) {
             ResponseWriter writer = facesContext.getResponseWriter();
             String clientId = component.getClientId(facesContext);
@@ -102,6 +105,9 @@ public final class SelectHelper {
 
                 String label = clientSelectItem.getLabel();
                 if (label != null && label.trim().length() > 0) {
+                    if (sel.isEnableItemTitles()) {
+                        writer.writeAttribute(HtmlConstants.TITLE_ATTRIBUTE, label, null);
+                    }
                     writer.writeText(label, null);
                 } else {
                     writer.write("\u00a0");
