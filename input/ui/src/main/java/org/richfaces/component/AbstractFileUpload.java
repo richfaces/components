@@ -54,12 +54,12 @@ public abstract class AbstractFileUpload extends UIComponentBase {
     public static final String COMPONENT_FAMILY = "org.richfaces.FileUpload";
 
     /**
-     * Defines comma separated list of file extensions accepted by component.
+     * Returns a list of file extensions accepted by component.
      * The component does not provide any feedback when rejecting file.
      * For introducing feedback for rejection, use ontyperejected parameter.
      */
     @Attribute
-    public abstract String getAcceptedTypes();
+    public abstract List<String> getAcceptedTypes();
 
     /**
      * Defines maximum number of files allowed to be uploaded. After a number of files in the list equals to the value
@@ -67,7 +67,7 @@ public abstract class AbstractFileUpload extends UIComponentBase {
      * In order to upload files again you should rerender the component
      */
     @Attribute
-    public abstract String getMaxFilesQuantity();
+    public abstract Integer getMaxFilesQuantity();
 
     /**
      * If "true", this component is disabled
