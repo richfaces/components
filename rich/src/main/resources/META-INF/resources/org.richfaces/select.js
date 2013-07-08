@@ -69,7 +69,7 @@
             this.cache = new rf.utils.Cache("", this.originalItems, getData, true);
         }
         this.changeDelay = mergedOptions.changeDelay;
-
+        
         if (this.defaultLabel == "") {
             var firstItem = this.clientSelectItems[0];
             var key = $(firstItem).attr("id");
@@ -129,7 +129,7 @@
 
             __onBtnMouseDown: function(e) {
                 if (!this.popupList.isVisible()) {
-                    this.__updateItems();
+                    this.__showOrigItems();
                     this.__showPopup();
                 } else {
                     this.__hidePopup();
@@ -163,7 +163,7 @@
                     case rf.KEYS.DOWN:
                         e.preventDefault();
                         if (!visible) {
-                            this.__updateItems();
+                            this.__showOrigItems();
                             this.__showPopup();
                         } else {
                             this.list.__selectNext();
@@ -253,6 +253,20 @@
 
                 if (this.selectFirst) {
                     this.list.__selectByIndex(0);
+                }
+            },
+
+            __showOrigItems: function() {
+                var newValue = this.__getValue();
+                newValue = (newValue != this.defaultLabel) ? newValue : "";
+                this.__updateItemsFromCache(newValue);
+
+                if (this.originalItems.length > 0 && this.enableManualInput) {
+                    var newItems = this.originalItems;
+                    var items = $(newItems);
+                    this.list.__setItems(items);
+                    $(document.getElementById(this.id + "Items")).empty().append(items);
+                    this.__save();
                 }
             },
 
