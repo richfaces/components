@@ -60,13 +60,12 @@
                 }
             },
             onhide: function() {
-    			$super.onhide.call(this);
+				$super.onhide.call(this); 
                 this.__hidePopup();
             },
 
             showPopup: function() {
                 $super.__show.call(this);
-
             },
             __showPopup: function() {
                 this.popupList.show();
@@ -75,16 +74,17 @@
             },
             hidePopup: function() {
             	$super.__hide.call(this);
+				this.__setFocused(false); 
             },
             __hidePopup: function() {
                 this.popupList.hide();
                 this.__showLabel();
-				this.__setFocused(false);
             },
+
             onsave: function() {
-                this.saveItemValue(this.__getValue());
-				this.list.__selectItemByValue(this.__getValue());
-				this.savedIndex = this.list.getSelectedItemIndex();
+				this.saveItemValue(this.__getValue());  
+				this.list.__selectItemByValue(this.__getValue());  
+				this.savedIndex = this.list.getSelectedItemIndex();  
             },
             oncancel: function() {
                 var item = this.list.getClientSelectItemByIndex(this.savedIndex);
@@ -105,11 +105,11 @@
             processItem: function(item) {
                 var label = $(item).data('clientSelectItem').label;
                 this.__setValue(label);
-                this.invokeEvent.call(this, "selectitem", document.getElementById(this.id));
-				if (this.saveOnSelect) {
-                    this.save();
-					this.hidePopup();
-                }
+				this.invokeEvent.call(this, "selectitem", document.getElementById(this.id));  
+				if (this.saveOnSelect) {  
+					this.save();  
+					this.hidePopup();  
+				}
             },
             saveItemValue: function(value) {
                 this.selValueInput.val(value);
@@ -154,14 +154,12 @@
                 $super.__keydownHandler.call(this, e);
             },
             __blurHandler: function(e) {
-                if (!this.isMouseDown && this.isEditState()) {
-                    this.timeoutId = window.setTimeout($.proxy(function() {
-                        this.onblur(e);
-                    }, this), 200);
-                } else {
-                    this.__setInputFocus();
-                    this.isMouseDown = false;
-                }
+				if (!this.isMouseDown && this.isEditState()) {  
+					var _this = this;
+					this.timeoutId = window.setTimeout($.proxy(function() {  
+						_this.onblur(e);  
+					}, this), 200);  
+                } 
             },
             __clickHandler: function(e) {
                 this.__showPopup();
