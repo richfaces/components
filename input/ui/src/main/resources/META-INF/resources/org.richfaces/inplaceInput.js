@@ -142,7 +142,7 @@
                     this.__setFocused(false);
                     this.invokeEvent.call(this, "blur", document.getElementById(this.id), e);
 
-                    if (!this.isValueSaved() && this.__isSaveOnBlur()) {
+                    if (this.__isSaveOnBlur()) {
                         this.save();
                     } else {
                         this.cancel();
