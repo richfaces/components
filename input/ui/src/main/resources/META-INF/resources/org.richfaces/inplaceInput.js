@@ -82,7 +82,7 @@
 
             __setInputFocus: function() {
                 this.getInput().unbind("focus", this.__editHandler);
-            	this.getInput().focus();
+                this.getInput().focus();
             },
 
             __saveBtnHandler: function(e) {
