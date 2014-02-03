@@ -60,19 +60,21 @@
                 }
             },
             onhide: function() {
+                $super.onhide.call(this); 
                 this.__hidePopup();
             },
 
             showPopup: function() {
                 $super.__show.call(this);
-
             },
             __showPopup: function() {
                 this.popupList.show();
                 this.__hideLabel();
+                this.__setFocused(true);
             },
             hidePopup: function() {
-            	$super.__hide.call(this);
+                $super.__hide.call(this);
+                this.__setFocused(false); 
             },
             __hidePopup: function() {
                 this.popupList.hide();
@@ -80,19 +82,9 @@
             },
 
             onsave: function() {
-                var item = this.list.currentSelectItem();
-                if (item) {
-                    var index = this.list.getSelectedItemIndex();
-                    var clientSelectItem = this.list.getClientSelectItemByIndex(index);
-                    var label = clientSelectItem.label;
-                    if (label == this.__getValue()) {
-                        this.savedIndex = index;
-                        this.saveItemValue(clientSelectItem.value);
-                        this.list.__selectByIndex(this.savedIndex);
-                    } else {
-                        this.list.__selectItemByValue(this.getValue());
-                    }
-                }
+                this.saveItemValue(this.__getValue());  
+                this.list.__selectItemByValue(this.__getValue());  
+                this.savedIndex = this.list.getSelectedItemIndex();  
             },
             oncancel: function() {
                 var item = this.list.getClientSelectItemByIndex(this.savedIndex);
@@ -101,7 +93,6 @@
                 this.list.__selectItemByValue(value);
             },
             onblur: function(e) {
-                this.__hidePopup();
                 $super.onblur.call(this);
             },
             onfocus: function(e) {
@@ -114,15 +105,11 @@
             processItem: function(item) {
                 var label = $(item).data('clientSelectItem').label;
                 this.__setValue(label);
-
-                this.__setInputFocus();
-                this.__hidePopup();
-
-                if (this.saveOnSelect) {
-                    this.save();
+                this.invokeEvent.call(this, "selectitem", document.getElementById(this.id));  
+                if (this.saveOnSelect) {  
+                    this.save();  
+                    this.hidePopup();  
                 }
-
-                this.invokeEvent.call(this, "selectitem", document.getElementById(this.id));
             },
             saveItemValue: function(value) {
                 this.selValueInput.val(value);
@@ -167,16 +154,12 @@
                 $super.__keydownHandler.call(this, e);
             },
             __blurHandler: function(e) {
-                if (this.saveOnSelect || !this.isMouseDown) {
-                    if (this.isEditState()) {
-                        this.timeoutId = window.setTimeout($.proxy(function() {
-                            this.onblur(e);
-                        }, this), 200);
-                    }
-                } else {
-                    this.__setInputFocus();
-                    this.isMouseDown = false;
-                }
+                if (!this.isMouseDown && this.isEditState()) {  
+                    var _this = this;
+                    this.timeoutId = window.setTimeout($.proxy(function() {  
+                        _this.onblur(e);  
+                    }, this), 200);  
+                } 
             },
             __clickHandler: function(e) {
                 this.__showPopup();
