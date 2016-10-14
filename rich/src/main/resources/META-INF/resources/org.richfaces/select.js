@@ -1,3 +1,25 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2013, Red Hat, Inc. and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 (function ($, rf) {
 
     rf.rf4 = rf.rf4 || {};
@@ -47,6 +69,20 @@
             this.cache = new rf.utils.Cache("", this.originalItems, getData, true);
         }
         this.changeDelay = mergedOptions.changeDelay;
+        
+        if (this.defaultLabel == "") {
+            var firstItem = this.clientSelectItems[0];
+            var key = $(firstItem).attr("id");
+            var label;
+            $.each(this.clientSelectItems, function() {
+                if (this.id == key) {
+                    label = this.label;
+                    return false;
+                }
+            });
+            this.__setValue(label);
+            this.__save();
+        }
     };
 
     rf.rf4.ui.InputBase.extend(rf.rf4.ui.Select);
@@ -93,7 +129,7 @@
 
             __onBtnMouseDown: function(e) {
                 if (!this.popupList.isVisible()) {
-                    this.__updateItems();
+                    this.__showOrigItems();
                     this.__showPopup();
                 } else {
                     this.__hidePopup();
@@ -127,10 +163,11 @@
                     case rf.KEYS.DOWN:
                         e.preventDefault();
                         if (!visible) {
-                            this.__updateItems();
+                            this.__showOrigItems();
                             this.__showPopup();
                         } else {
                             this.list.__selectNext();
+                            this.__setCurrentSelectToInput();
                         }
                         break;
 
@@ -138,6 +175,7 @@
                         e.preventDefault();
                         if (visible) {
                             this.list.__selectPrev();
+                            this.__setCurrentSelectToInput();
                         }
                         break;
 
@@ -220,6 +258,38 @@
                 }
             },
 
+            __showOrigItems: function() {
+                var newValue = this.__getValue();
+                newValue = (newValue != this.defaultLabel) ? newValue : "";
+                this.__updateItemsFromCache(newValue);
+
+                if (this.originalItems.length > 0 && this.enableManualInput) {
+                    var newItems = this.originalItems;
+                    var items = $(newItems);
+                    this.list.__setItems(items);
+                    $(document.getElementById(this.id + "Items")).empty().append(items);
+                    this.__save();
+                }
+            },
+
+            __setCurrentSelectToInput : function() {
+                var item;
+                item = this.list.items.eq(this.list.index);
+
+                var key = $(item).attr("id");
+                var label;
+                $.each(this.clientSelectItems, function() {
+                    if (this.id == key) {
+                        label = this.label;
+                        return false;
+                    }
+                });
+                this.__setValue(label);
+                this.__save();
+
+                this.invokeEvent.call(this, "selectitem", document.getElementById(this.id));
+            },
+
             __updateItemsFromCache: function(value) {
                 if (this.originalItems.length > 0 && this.enableManualInput) {
                     var newItems = this.cache.getItems(value, this.filterFunction);
@@ -237,20 +307,27 @@
                     if (items && items.length > 0) {
                         var first = $(items[0]);
                         $.each(this.clientSelectItems, function() {
-                            if (this.id == first.attr("id")) {
+                            if (this.label == inputLabel) {
                                 label = this.label;
                                 value = this.value;
                                 return false;
                             }
                         });
-                    } else {
-                        label = inputLabel;
-                        value = "";
-                    }
-                }
 
-                if (label) {
-                    return {'label': label, 'value': value};
+                    } else {
+                        this.container.removeClass("rf-sel-fld-err");
+
+                        var prevValue = this.selValueInput.val();
+                        if (prevValue && prevValue != "") {
+                            $.each(this.clientSelectItems, function() {
+                                if (this.value == prevValue) {
+                                    label = this.label;
+                                    value = this.value;
+                                    return false;
+                                }
+                            });
+                        }
+                    }
                 }
             },
 
